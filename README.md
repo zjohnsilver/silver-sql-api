@@ -25,18 +25,22 @@ FastAPI backend for Silver SQL Console - SQL query execution API.
 
 ### Prerequisites
 
+- **uv** (recommended Python package manager)
 - Python 3.12+
-- pip or poetry
 
 ### Installation
 
 ```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Install dependencies
-pip install -r requirements.txt
+# Create virtual environment and install dependencies
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e .
+
+# Or install dependencies directly without activation
+uv pip install -r requirements.txt
 
 # Copy environment variables
 cp .env.example .env
@@ -48,6 +52,9 @@ cp .env.example .env
 
 ```bash
 # Run development server with auto-reload
+uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Or with activated venv
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
