@@ -35,8 +35,6 @@ ENV/
 .uv/
 uv.lock
 
-# IDEs
-.vscode/
 .idea/
 *.swp
 *.swo

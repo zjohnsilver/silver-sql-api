@@ -1,11 +1,6 @@
-from typing import Optional, List, Any, Literal
+from typing import Any, List, Literal, Optional
+
 from pydantic import BaseModel, Field
-
-
-class Client(BaseModel):
-    id: str
-    name: str
-    tag: Optional[str] = None
 
 
 class QueryOptions(BaseModel):
@@ -19,7 +14,7 @@ class ColumnMetadata(BaseModel):
 
 
 class QueryResultSelect(BaseModel):
-    type: Literal['select'] = 'select'
+    type: Literal["select"] = "select"
     columns: List[ColumnMetadata]
     rows: List[List[Any]]
     total_rows: int
@@ -29,16 +24,9 @@ class QueryResultSelect(BaseModel):
 
 
 class QueryResultNonSelect(BaseModel):
-    type: Literal['non_select'] = 'non_select'
+    type: Literal["non_select"] = "non_select"
     statement_type: str
     rows_affected: int
     duration_ms: float
     messages: Optional[List[str]] = None
     warnings: Optional[List[str]] = None
-
-
-class ErrorResponse(BaseModel):
-    detail: str
-    code: Optional[str] = None
-    hint: Optional[str] = None
-

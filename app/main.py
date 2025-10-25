@@ -1,52 +1,51 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
+from app.features.client import router as client_router
+from app.features.query import router as query_router
 from app.shared.config import settings
-from app.features.clients import router as clients_router
-from app.features.queries import router as queries_router
 
 app = FastAPI(
-    title=settings.app_name,
-    version=settings.app_version,
-    description="SQL query execution API for Silver SQL Console"
+    title=settings.API_NAME,
+    version=settings.API_VERSION,
+    description=f"{settings.API_NAME} - {settings.API_VERSION}",
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include feature routers
-app.include_router(clients_router)
-app.include_router(queries_router)
+app.include_router(client_router)
+app.include_router(query_router)
 
 
 @app.get("/")
 async def root():
     return {
-        "name": settings.app_name,
-        "version": settings.app_version,
-        "status": "running"
+        "name": settings.API_NAME,
+        "version": settings.API_VERSION,
+        "status": "running",
     }
 
 
-@app.get("/health")
+@app.get("/healthcheck")
 async def health_check():
-    return {"status": "healthy"}
+    return {"status": "ok"}
 
 
-# Global exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
         content={
             "detail": "Internal server error",
-            "message": str(exc) if settings.debug else "An unexpected error occurred"
-        }
+            "message": str(exc)
+            if settings.DEBUG
+            else "An unexpected error occurred",
+        },
     )
-
