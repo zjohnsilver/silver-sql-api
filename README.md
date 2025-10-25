@@ -34,15 +34,13 @@ FastAPI backend for Silver SQL Console - SQL query execution API.
 # Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Create virtual environment and install dependencies
+# Quick setup with Makefile (recommended)
+make setup
+
+# Or manually:
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 uv pip install -e .
-
-# Or install dependencies directly without activation
-uv pip install -r requirements.txt
-
-# Copy environment variables
 cp .env.example .env
 
 # Update .env with your configuration
@@ -51,12 +49,28 @@ cp .env.example .env
 ### Development
 
 ```bash
-# Run development server with auto-reload
+# Start development server (recommended)
+make start
+
+# Or manually with uv
 uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 # Or with activated venv
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+## Makefile Commands
+
+The project includes a Makefile for common tasks:
+
+- `make setup` - Setup project (create venv, install dependencies, copy .env)
+- `make start` - Start development server
+- `make dev` - Alias for start
+- `make test` - Run tests
+- `make lint` - Run linter (ruff)
+- `make format` - Format code (black + ruff)
+- `make clean` - Clean up generated files
+- `make help` - Show all available commands
 
 API will be available at:
 - **API**: http://localhost:8000
