@@ -7,19 +7,18 @@ FastAPI backend for Silver SQL Console - SQL query execution API.
 - **Framework**: FastAPI
 - **Language**: Python 3.12
 - **Validation**: Pydantic v2
-- **Authentication**: JWT (python-jose)
 - **Database Drivers**: asyncpg (PostgreSQL), aiomysql (MySQL)
 - **ORM**: SQLAlchemy 2.0
+- **Architecture**: Vertical Slice Architecture
 
 ## Features
 
 - Client search and connection management
 - SQL query execution with timeout and row limits
-- JWT-based authentication
-- Role-based access control
 - Query validation and security checks
 - Async/await throughout
 - Type-safe with Pydantic models
+- Vertical Slice Architecture for better feature isolation
 
 ## Getting Started
 
@@ -121,25 +120,46 @@ Key variables:
 - `DEFAULT_MAX_ROWS`: Default query result limit
 - `DEFAULT_TIMEOUT_SECONDS`: Default query timeout
 
-## Project Structure
+## Project Structure (Vertical Slice Architecture)
 
 ```
 app/
-├── api/              # API route handlers
-├── core/             # Core utilities (config, auth)
-├── models/           # Pydantic models
-├── services/         # Business logic
-└── main.py           # FastAPI application
+├── features/              # Feature slices
+│   ├── clients/          # Client management feature
+│   │   ├── endpoints.py  # API routes
+│   │   ├── service.py    # Business logic
+│   │   └── models.py     # Feature-specific models
+│   └── queries/          # Query execution feature
+│       ├── endpoints.py  # API routes
+│       ├── service.py    # Business logic
+│       └── models.py     # Feature-specific models
+├── shared/               # Shared utilities and models
+│   ├── config.py        # Application configuration
+│   └── models.py        # Shared domain models
+└── main.py              # FastAPI application
 ```
+
+### Why Vertical Slice Architecture?
+
+Each feature is self-contained with its own:
+- **Endpoints**: API route handlers
+- **Service**: Business logic and data access
+- **Models**: Feature-specific request/response models
+
+This approach provides:
+- Better feature isolation and maintainability
+- Easier to add/remove features
+- Clear boundaries between features
+- Reduced coupling between components
 
 ## Security Notes
 
-- Change `SECRET_KEY` in production
 - Use HTTPS in production
 - Implement proper database connection pooling
 - Add rate limiting for production use
 - Review and enhance SQL validation rules
 - Implement audit logging
+- Add authentication if needed for your use case
 
 ## License
 

@@ -1,0 +1,2 @@
+# Features - Vertical Slice Architecture
+

@@ -1,5 +1,5 @@
 from typing import List, Optional
-from app.models.schemas import Client
+from app.shared.models import Client
 
 
 class ClientService:

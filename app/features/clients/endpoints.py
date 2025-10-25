@@ -1,8 +1,8 @@
 from typing import List
-from fastapi import APIRouter, Query, HTTPException, Depends
-from app.models.schemas import Client, ConnectionResolveResponse
-from app.services.client_service import client_service
-from app.core.auth import get_current_user
+from fastapi import APIRouter, Query, HTTPException
+from app.shared.models import Client
+from app.features.clients.models import ConnectionResolveResponse
+from app.features.clients.service import client_service
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -11,7 +11,6 @@ router = APIRouter(prefix="/clients", tags=["clients"])
 async def search_clients(
     search: str = Query("", description="Search term for client name or tag"),
     limit: int = Query(20, ge=1, le=100, description="Maximum number of results"),
-    user: dict = Depends(get_current_user)
 ):
     """
     Search for clients by name or tag.
@@ -21,10 +20,7 @@ async def search_clients(
 
 
 @router.post("/{client_id}/resolve", response_model=ConnectionResolveResponse)
-async def resolve_connection(
-    client_id: str,
-    user: dict = Depends(get_current_user)
-):
+async def resolve_connection(client_id: str):
     """
     Verify that connection information is available for a client.
     """

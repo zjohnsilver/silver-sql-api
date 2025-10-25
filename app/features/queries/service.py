@@ -3,13 +3,12 @@ import re
 import asyncio
 from typing import Union, List, Any, Tuple
 from fastapi import HTTPException
-from app.models.schemas import (
-    QueryExecuteRequest,
+from app.shared.models import (
     QueryResultSelect,
     QueryResultNonSelect,
     ColumnMetadata,
 )
-from app.services.client_service import client_service
+from app.features.clients.service import client_service
 
 
 class QueryService:
@@ -63,19 +62,8 @@ class QueryService:
             if re.search(pattern, sql, re.IGNORECASE):
                 raise HTTPException(
                     status_code=403,
-                    detail=f"Statement contains forbidden operation: {pattern}"
+                    detail=f"Statement contains forbidden operation"
                 )
-    
-    def _check_policy(self, statement_type: str, user_roles: List[str]) -> None:
-        """
-        Check if user has permission to execute this statement type.
-        """
-        # Example policy: only SELECT allowed for read-only roles
-        if 'read_only' in user_roles and statement_type != 'SELECT':
-            raise HTTPException(
-                status_code=403,
-                detail=f"Your role does not permit {statement_type} statements"
-            )
     
     async def _execute_on_connection(
         self,
@@ -117,8 +105,10 @@ class QueryService:
     
     async def execute_query(
         self,
-        request: QueryExecuteRequest,
-        user: dict
+        client_id: str,
+        sql: str,
+        max_rows: int = 5000,
+        timeout_seconds: int = 30
     ) -> Union[QueryResultSelect, QueryResultNonSelect]:
         """
         Main query execution method.
@@ -126,32 +116,23 @@ class QueryService:
         start_time = time.time()
         
         # Get connection info
-        conn_info = await client_service.get_connection_info(request.client_id)
+        conn_info = await client_service.get_connection_info(client_id)
         if not conn_info:
             raise HTTPException(
                 status_code=404,
-                detail=f"Client {request.client_id} not found"
+                detail=f"Client {client_id} not found"
             )
         
         # Validate SQL
-        self._validate_sql(request.sql)
+        self._validate_sql(sql)
         
         # Parse statement type
-        statement_type = self._parse_statement_type(request.sql)
-        
-        # Check policy
-        user_roles = user.get('roles', [])
-        self._check_policy(statement_type, user_roles)
-        
-        # Get options
-        options = request.options or {}
-        max_rows = options.max_rows if hasattr(options, 'max_rows') else 5000
-        timeout_seconds = options.timeout_seconds if hasattr(options, 'timeout_seconds') else 30
+        statement_type = self._parse_statement_type(sql)
         
         # Execute query
         try:
             columns, rows, rows_affected, stmt_type = await asyncio.wait_for(
-                self._execute_on_connection(conn_info, request.sql, max_rows, timeout_seconds),
+                self._execute_on_connection(conn_info, sql, max_rows, timeout_seconds),
                 timeout=timeout_seconds
             )
         except asyncio.TimeoutError:

@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings
-from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -10,11 +9,6 @@ class Settings(BaseSettings):
     
     # CORS
     cors_origins: list[str] = ["http://localhost:3000"]
-    
-    # JWT Settings
-    secret_key: str = "your-secret-key-change-in-production"
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
     
     # Database Settings (Client Management DB)
     database_url: str = "postgresql://user:password@localhost/silver_sql_clients"

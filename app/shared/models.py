@@ -8,24 +8,9 @@ class Client(BaseModel):
     tag: Optional[str] = None
 
 
-class ClientSearchResponse(BaseModel):
-    clients: List[Client]
-
-
-class ConnectionResolveResponse(BaseModel):
-    status: str
-    message: Optional[str] = None
-
-
 class QueryOptions(BaseModel):
     max_rows: int = Field(default=5000, ge=1, le=100000)
     timeout_seconds: int = Field(default=30, ge=1, le=300)
-
-
-class QueryExecuteRequest(BaseModel):
-    client_id: str
-    sql: str
-    options: Optional[QueryOptions] = None
 
 
 class ColumnMetadata(BaseModel):
@@ -50,12 +35,6 @@ class QueryResultNonSelect(BaseModel):
     duration_ms: float
     messages: Optional[List[str]] = None
     warnings: Optional[List[str]] = None
-
-
-class QueryError(BaseModel):
-    code: str
-    message: str
-    hint: Optional[str] = None
 
 
 class ErrorResponse(BaseModel):

@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.core.config import settings
-from app.api import clients, queries
+from app.shared.config import settings
+from app.features.clients import router as clients_router
+from app.features.queries import router as queries_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -19,9 +20,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(clients.router)
-app.include_router(queries.router)
+# Include feature routers
+app.include_router(clients_router)
+app.include_router(queries_router)
 
 
 @app.get("/")
